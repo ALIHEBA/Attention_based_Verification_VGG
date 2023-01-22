@@ -1,8 +1,8 @@
-# Attention based Handwriting Verification using VGG
+# Attention based Handwriting Verification using VGG16
 
-The proposed system makes handwriting verification using VGG architecture ans soft attantion inaddition to cross attention to extract the most important features.
+The proposed system makes handwriting verification using VGG16 architecture ans soft attantion inaddition to cross attention to extract the most important features.
 
-# The proposed architcture
+![Eng to End Architecture using VGG16]()
 
 
 
