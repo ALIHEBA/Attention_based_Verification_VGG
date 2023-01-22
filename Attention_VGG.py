@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
-
-
 import tensorflow as tf
 from tensorflow import keras
 from keras.applications.vgg16 import VGG16
@@ -42,8 +39,6 @@ import matplotlib.pyplot as plt
 import sklearn.metrics as metrics
 
 
-# In[9]:
-
 
 from tensorflow.python.client import device_lib
 
@@ -53,8 +48,6 @@ def get_available_devices():
 
 print(get_available_devices())
 
-
-# In[11]:
 
 
 import tensorflow.compat.v1 as tf
@@ -67,8 +60,6 @@ s=tf.Session(config=tf_config)
 K.set_session(s)
 
 
-# In[12]:
-
 
 ds_folder = '/home/nu/Work/Heba/Image_Forensics_Project/dataset/all'
 ds = np.array(os.listdir(ds_folder))
@@ -76,7 +67,6 @@ np.random.shuffle(ds)
 ds[:10]
 
 
-# In[13]:
 
 
 def VGGNet():
@@ -109,14 +99,10 @@ def VGGNet():
     return Model(image_input,x,name='imgModel')
 
 
-# In[14]:
-
 
 feat_ext_A = VGGNet()
 feat_ext_A.summary()
 
-
-# In[21]:
 
 
 SVG(model_to_dot(feat_ext_A,show_layer_names=True, show_shapes=True).create(prog='dot', format='svg'))
@@ -124,7 +110,6 @@ SVG(model_to_dot(feat_ext_A,show_layer_names=True, show_shapes=True).create(prog
 
 # ## extract features from the stem model
 
-# In[22]:
 
 
 l_inp = kl.Input(shape=(64,64,1),name='l')
@@ -135,7 +120,6 @@ right_feats = feat_ext_A(r_inp)
 
 # ## apply cross attention between the extracted features
 
-# In[23]:
 
 
 att_l_1,l_map_1 = CrossAttention(ch=int(left_feats.shape[-1]),name='ca_l2r_1')([left_feats,right_feats]) #[k,q]
@@ -159,7 +143,6 @@ r2l_comb = kl.BatchNormalization()(r2l_comb)
 
 # ## combine the attended features
 
-# In[24]:
 
 
 all_concat = kl.Concatenate()([l2r_comb,r2l_comb])
@@ -167,8 +150,6 @@ all_concat = kl.Activation('relu')(all_concat)
 
 
 # ## futher joint feature extraction
-
-# In[25]:
 
 
 
@@ -214,7 +195,6 @@ model.summary()
 
 # ## view the model in SVG mode
 
-# In[13]:
 
 
 SVG(model_to_dot(model,show_layer_names=True, show_shapes=True).create(prog='dot', format='svg'))
@@ -222,7 +202,6 @@ SVG(model_to_dot(model,show_layer_names=True, show_shapes=True).create(prog='dot
 
 # ## load data for a given fold
 
-# In[26]:
 
 
 nb_fold = 1
@@ -235,19 +214,11 @@ df_v = df_v.sort_values(by=['left','right','label']).reset_index()
 
 # ## visualize the ground truth data
 
-# In[27]:
 
 
 display(df_tr.head())
-
-
-# In[28]:
-
-
 df_tr.shape
 
-
-# In[29]:
 
 
 display(df_v.head()),df_v.shape
@@ -255,7 +226,6 @@ display(df_v.head()),df_v.shape
 
 # ## function for datagenerator
 
-# In[30]:
 
 
 def datagen(ds,batch_size=128,seq=False,mode=''):
@@ -302,8 +272,6 @@ def datagen(ds,batch_size=128,seq=False,mode=''):
 
 # ## function for categorical focal loss
 
-# In[31]:
-
 
 def categorical_focal_loss(gamma=2.0, alpha=0.75):
     def focal_loss(y_true, y_pred):
@@ -321,29 +289,22 @@ def categorical_focal_loss(gamma=2.0, alpha=0.75):
     return focal_loss
 
 
-# In[32]:
-
-
 tr_batch_size=192
 val_batch_size=512
 tr_gen = datagen(df_tr,batch_size=tr_batch_size,seq=True,mode='train')
 v_gen = datagen(df_v,batch_size=val_batch_size,seq=True,mode='val')
 
 
-# In[33]:
 
 
 inputs,outputs=next(tr_gen)
 l,r,y,n = inputs['l'],inputs['r'],outputs['y'],outputs['names']
 
 
-# In[34]:
 
 
 l.shape,r.shape,y.shape,n.shape
 
-
-# In[36]:
 
 
 plt.imshow(l[0][:,:,0])
@@ -356,19 +317,10 @@ plt.imshow(r[1][:,:,0])
 plt.show()
 
 
-# In[37]:
-
 
 p_l = feat_ext_A.predict(l)
-
-
-# In[38]:
-
-
 p_l.shape
 
-
-# In[39]:
 
 
 y_true = np.array([0.0,1.0])
@@ -377,23 +329,13 @@ cce = -y_true*np.log(y_pred)
 cce
 
 
-# In[40]:
-
 
 alpha = 0.95 if np.argmax(y_true)==1 else 1 - 0.95
 print(alpha)
 gamma = 2.0
 w = alpha * y_true * np.power((1.0-y_pred), gamma)
-w
-
-
-# In[41]:
-
 
 w*cce
-
-
-# In[42]:
 
 
 plt.imshow(p_l[0][:,:,92])
@@ -411,20 +353,14 @@ plt.imshow(p_l[0][:,:,92])
 
 # ## This is for unbalanced class
 
-# In[64]:
 
 
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
 
-# In[65]:
 
-
-model.compile(loss=categorical_focal_loss(),optimizer=Adam(lr=0.0001,decay=1e-06),metrics=['accuracy'])
-
-
-# In[66]:
+model.compile(loss=categorical_focal_loss(),optimizer=Adam(lr=0.0001,decay=1e-06),metrics=['accuracy']
 
 
 class MultiGPUCheckpoint(ModelCheckpoint):    
@@ -435,7 +371,6 @@ class MultiGPUCheckpoint(ModelCheckpoint):
             self.model = model
 
 
-# In[67]:
 
 
 if not os.path.exists('/home/nu/Work/Heba/Image_Forensics_Project/AttentionHandwritingVerification/checkpoints/ICFHR2020/'):
@@ -447,15 +382,12 @@ tb=TensorBoard(log_dir="/home/nu/Work/Heba/Image_Forensics_Project/AttentionHand
 
 # ## load weights if any
 
-# In[68]:
-
 
 model.load_weights('/home/nu/Work/Heba/Image_Forensics_Project/AttentionHandwritingVerification/checkpoints/ICFHR2020/cross_attention_residual_vgg_fold_1.h5',by_name=True,skip_mismatch=True)
 
 
 # ## start the training
 
-# In[48]:
 
 
 Epochs=5
@@ -466,13 +398,10 @@ h=model.fit_generator(tr_gen,initial_epoch=4,callbacks=[mc,es,tb],epochs=Epochs,
 
 # # Evaluation
 
-# In[66]:
 
 
 model.load_weights('/home/nu/Work/Heba/Image_Forensics_Project/AttentionHandwritingVerification/checkpoints/ICFHR2020/cross_attention_residual_vgg_fold_1.h5')
 
-
-# In[115]:
 
 
 v_gen = datagen(df_v,batch_size=256,seq=True)
@@ -482,7 +411,6 @@ test_x,test_y = inputs,outputs['y']
 
 # ## Make post processing models to visualize attention maps
 
-# In[116]:
 
 
 soft_attention_1 = Model(feat_ext_A.inputs,feat_ext_A.get_layer('soft_attention_1').output)
@@ -520,15 +448,12 @@ f_ca_r2l_2,maps_r2l_2 = ca_r2l_2_model.predict(test_x)
 
 # ## check how much importance is being given to attention by the model
 
-# In[117]:
 
 
 l2r_g1[image_idx],l2r_g2[image_idx],r2l_g1[image_idx],r2l_g2[image_idx]
 
 
 # ## combine the left maps and right maps respectively
-
-# In[118]:
 
 
 mapl  = maps_l2r_1+maps_l2r_2
@@ -537,41 +462,27 @@ mapr  = maps_r2l_1+maps_r2l_2
 mapr.shape
 
 
-# In[119]:
 
 
 feats_sa3.shape,maps_sa3.shape, f_ca_l2r_1.shape,maps_l2r_1.shape
 
-
-# In[128]:
-
-
 image_index = 23
 print(outputs['names'][image_index])
 
-
-# In[129]:
-
-
 preds = model.predict(test_x)
-
-
-# In[130]:
-
 
 preds[image_index]
 
 
 # ## Get important pixels to query
 
-# In[131]:
 
 
 resized_left_img = cv2.resize(test_x['l'][image_index],(16,16),cv2.INTER_CUBIC)
 resized_right_img = cv2.resize(test_x['r'][image_index],(16,16),cv2.INTER_CUBIC)
 
 
-# In[132]:
+
 
 
 plt.imshow(resized_left_img)
@@ -580,7 +491,7 @@ plt.imshow(resized_right_img)
 plt.show()
 
 
-# In[133]:
+
 
 
 def getRowCol(point):
@@ -591,7 +502,6 @@ def getRowCol(point):
 
 # # Visualize Cross Attention
 
-# In[136]:
 
 
 '''
@@ -653,7 +563,6 @@ print('matched left_points:',left_points)
 
 # ## See all CA maps
 
-# In[90]:
 
 
 plt.imshow(maps_l2r_1[image_index],cmap='jet')
@@ -666,7 +575,7 @@ plt.imshow(maps_r2l_2[image_index],cmap='jet')
 plt.show()
 
 
-# In[91]:
+
 
 
 print('-----**********visualize SA1 maps************-----')
@@ -729,14 +638,10 @@ plt.imshow(cv2.resize(maps_sa5[image_index].sum(axis=0),(64,64),interpolation=cv
 plt.show()
 
 
-# In[92]:
+
 
 
 maps_sa5[image_index].sum(axis=0)
-
-
-# In[105]:
-
 
 # sn.heatmap(maps2_r[image_index][j+i*26].reshape((26,26)),cmap='jet')
 sn.heatmap(cv2.resize(maps_sa3[image_index].sum(axis=0),(64,64),interpolation=cv2.INTER_CUBIC),cmap='jet')
@@ -746,13 +651,10 @@ sn.heatmap(cv2.resize(maps_sa3[image_index].sum(axis=0),(64,64),interpolation=cv
 # # Evaluate the network
 # - Evaluating network VGG Cross and Soft Attention
 
-# In[93]:
-
 
 classnames=['Inter','Intra']
 
 
-# In[96]:
 
 
 v_gen = datagen(df_v,batch_size=512,seq=True)
@@ -770,16 +672,12 @@ print(arr_test_y.shape)
 print(arr_preds.shape)
 
 
-# In[97]:
-
 
 arr_preds_logits = arr_preds.argmax(-1)
 print(arr_preds[image_index],arr_preds_logits[image_index],arr_test_y[image_index])
 # arr_preds_logits = np.array([1 if a>0.5 else 0 for a in arr_preds])
 # arr_preds_logits,arr_test_y.argmax(-1)
 
-
-# In[98]:
 
 
 df = pd.DataFrame()
@@ -788,15 +686,10 @@ df = df.from_dict(f)
 display(df.T)
 
 
-# In[100]:
 
 
 cm=metrics.confusion_matrix(arr_test_y.argmax(-1),arr_preds_logits)
 cm
-
-
-# In[101]:
-
 
 
 def get_FPR_intra(cm):
@@ -809,13 +702,9 @@ def get_FNR_intra(cm):
     return FN/(FN+TP)
 
 
-# In[102]:
-
 
 get_FPR_intra(cm)*100,get_FNR_intra(cm)*100
 
-
-# In[103]:
 
 
 def plot_confusion_matrix(cm,
@@ -897,7 +786,7 @@ def plot_confusion_matrix(cm,
     plt.show()
 
 
-# In[104]:
+
 
 
 plot_confusion_matrix(cm=cm,cmap='YlOrBr',target_names=classnames, normalize=False)
