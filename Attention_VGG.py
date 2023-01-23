@@ -389,9 +389,10 @@ model.load_weights('/home/nu/Work/Heba/Image_Forensics_Project/AttentionHandwrit
 # ## start the training
 
 
-
+#Epochs=100
+# Epochs=10             
 Epochs=5
-h=model.fit_generator(tr_gen,initial_epoch=4,callbacks=[mc,es,tb],epochs=Epochs,steps_per_epoch=2*((df_tr.shape[0]//tr_batch_size)+1)
+h=model.fit_generator(tr_gen,initial_epoch=5,callbacks=[mc,es,tb],epochs=Epochs,steps_per_epoch=2*((df_tr.shape[0]//tr_batch_size)+1)
                       ,validation_data=v_gen, validation_steps=2*60, verbose=1)
                                )
 
