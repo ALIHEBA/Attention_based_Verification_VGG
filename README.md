@@ -5,10 +5,10 @@ The proposed system makes handwriting verification using VGG16 architecture ans 
 ![Eng to End Architecture using VGG16](model.png)
 
 
-#Cross Attention
+# Cross Attention
 ![Cross Attention](SAM.png)
 
-#Soft Attention
+# Soft Attention
 ![Soft Attention](CAM.png)
 
 # Datasets
@@ -18,7 +18,7 @@ The proposed system makes handwriting verification using VGG16 architecture ans 
 - Handwritten "AND": https://github.com/mshaikh2/HDL_Forensics
 - CEDAR Signature: http://www.cedar.buffalo.edu/NIJ/data
 
-#How to run the code 
+# How to run the code 
 1. Install Miniconda/anaconda
 2. create new enviroment 
 ```
@@ -35,5 +35,5 @@ pip install tensorflow-gpu
 conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
 ```
 4. Add dataset paths 
-5. Add the path of checkpoints folder that contains the weights file cross_attention_residual_vgg_fold_1.h5
+5. Add the path of checkpoints folder that contains the weights file *cross_attention_residual_vgg_fold_1.h5*
 
